@@ -1,3 +1,4 @@
+import random
 
 class Graph():
     def __init__ (self):
@@ -10,34 +11,66 @@ class Graph():
     
     def mergeVertex(self, srcName, destName):
 
+        #print('in src: ', srcName, 'in dest: ', destName)
+
+        srcNameFinal = srcName
+        destNameFinal = destName
+
+        if G.vtxStatus[src] == False:
+            #isChildSrc = True
+            while G.vtxStatus[srcNameFinal] == False:
+                srcNameFinal = G.vtxDict[srcNameFinal].pointsToVertexName
+
+        if G.vtxStatus[dest] == False:
+            #isChildDest = True
+            while G.vtxStatus[destNameFinal] == False:
+                destNameFinal = G.vtxDict[destNameFinal].pointsToVertexName
+
+
+        # for future randomization
         srcVtx = self.vtxDict[srcName]
-        srcVtx.edges.remove(destName)
-
-        # Trace back to the active
-        while G.vtxStatus[destName] == False:
-            destName = G.vtxDict[destName].pointsToVertexName
+        srcVtx.remainingEdges.remove(destName)
         destVtx = self.vtxDict[destName]
-        destVtx.edges.remove(srcName)
-        
-        # inactivate the vertex
-        self.vtxStatus[destName] = False 
+        destVtx.remainingEdges.remove(srcName)
 
-        # consolidate edge to the parent
-        srcVtx.edges += destVtx.edges
-        destVtx.pointsToVertexName = srcVtx.name
-        destVtx.edges = []
 
-        # consolidate the child to the parent
-        srcVtx.childVertexName += (destVtx.childVertexName + [destVtx.name])
 
-        # Clear self-loop
-        for childName in srcVtx.childVertexName:
+        if srcNameFinal != destNameFinal:
 
-            if childName in srcVtx.edges:
-                #print('dropping ', childName)
-                #print(srcVtx.name, 'has child ', srcVtx.childVertexName, 'edge list', srcVtx.edges)
-                srcVtx.edges.remove(childName)
+            # set inactive
+            self.vtxStatus[destNameFinal] = False 
+            print(destNameFinal, 'becomes inactive')
+            #print('in srcFinal: ', srcNameFinal, 'in destFinal: ', destNameFinal)
 
+            # consolidate edge to the parent
+            srcVtxFinal = self.vtxDict[srcNameFinal]
+            destVtxFinal = self.vtxDict[destNameFinal]
+
+
+            # remove original name
+
+            srcVtxFinal.edges.remove(destName)
+            destVtxFinal.edges.remove(srcName)
+
+
+            srcVtxFinal.edges += destVtxFinal.edges
+            destVtxFinal.pointsToVertexName = srcVtxFinal.name
+            destVtxFinal.edges = []
+
+            # consolidate the child to the parent
+            srcVtxFinal.childVertexName += (destVtxFinal.childVertexName + [destVtxFinal.name])
+
+
+            # clear self-loop
+            for childName in srcVtxFinal.childVertexName:
+
+                if childName in srcVtxFinal.edges:
+                    #print('dropping ', childName)
+                    #print(srcVtx.name, 'has child ', srcVtx.childVertexName, 'edge list', srcVtx.edges)
+                    srcVtxFinal.edges.remove(childName)
+
+            if srcVtxFinal.name in srcVtxFinal.edges:
+                srcVtxFinal.edges.remove(srcVtxFinal.name)
 
 
 class Vertex():
@@ -46,24 +79,43 @@ class Vertex():
         self.edges = edges
         self.pointsToVertexName = None
         self.childVertexName = []
+        self.remainingEdges = edges[:] # to keep track
+
 
 
 def radomlySelectEdge(G):
-    # manual testing
-    src = '1'
-    dest = '3'
+    idxVtx = random.randint(0, len(G.vtxDict) - 1)
+    randVtxName = list(G.vtxDict.keys())[idxVtx]
 
-    return src, dest
+    # Random sampling until not empty node
+    while G.vtxDict[randVtxName].remainingEdges == []:
+        idxVtx = random.randint(0, len(G.vtxDict) - 1)
+        randVtxName = list(G.vtxDict.keys())[idxVtx]
+
+    # inactive vertex
+    #randVtxNameOrig= randVtxName # save original
+
+    #while G.vtxStatus[randVtxName] == False:
+    #    randVtxName = G.vtxDict[randVtxName].pointsToVertexName
+    #    isChildSrc = True
+
+    idxEdge = random.randint(0, len(G.vtxDict[randVtxName].remainingEdges) -1 )
+    randEdgeName = G.vtxDict[randVtxName].remainingEdges[idxEdge]
+
+    return randVtxName, randEdgeName
+
 
 def printVtxEdgeList(G):
     for key in G.vtxDict.keys():
         print(key, G.vtxDict[key].edges, 'child: ',  G.vtxDict[key].childVertexName)
 
 if __name__ == "__main__":
+    random.seed(10)
 
     G = Graph()
+    with open('pa4.txt') as f:
     #with open('kargerMincut.txt') as f:
-    with open('graph.txt') as f:
+    #with open('graph.txt') as f:
 
         lines = f.readlines()
         for line in lines:
@@ -75,21 +127,24 @@ if __name__ == "__main__":
             G.vtxDict[vertex.name] = vertex
             G.vtxStatus[vertex.name] = True
 
-        printVtxEdgeList(G)
+        #printVtxEdgeList(G)
 
     while ( G.total_alive_vertices() > 2 ):
-        print("---merge")
-        G.mergeVertex('1','2')
-        printVtxEdgeList(G)
-
-        print("---merge")
 
         src, dest = radomlySelectEdge(G)
+        print("---merge: src", src, 'dest', dest)
 
         G.mergeVertex(src, dest)
+
         printVtxEdgeList(G)
 
-        break
 
+    for key in G.vtxDict.keys():
+        if G.vtxStatus[key] == True:
+            print(key, 'edge len', len(G.vtxDict[key].edges))
+            
+    printVtxEdgeList(G)
+
+    #print("result: ")
 
 
