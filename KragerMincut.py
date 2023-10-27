@@ -7,50 +7,60 @@ class Graph():
     def total_alive_vertices(self):
         return sum (self.vtxStatus.values())
 
-    def mergeVertex(self, vtxName1, vtxName2):
+    
+    def mergeVertex(self, srcName, destName):
+
+        srcVtx = self.vtxDict[srcName]
+        srcVtx.edges.remove(destName)
+
+        # Trace back to the active
+        while G.vtxStatus[destName] == False:
+            destName = G.vtxDict[destName].pointsToVertexName
+        destVtx = self.vtxDict[destName]
+        destVtx.edges.remove(srcName)
         
-        vtx1 = self.vtxDict[vtxName1]
-        vtx2 = self.vtxDict[vtxName2]
+        # inactivate the vertex
+        self.vtxStatus[destName] = False 
 
-        vtx1.edges.remove(vtxName2)
-        vtx2.edges.remove(vtxName1)
+        # consolidate edge to the parent
+        srcVtx.edges += destVtx.edges
+        destVtx.pointsToVertexName = srcVtx.name
+        destVtx.edges = []
 
-        self.vtxStatus[vtxName2] = False
-
-        vtx1.edges += vtx2.edges
-        vtx2.pointsToVertexName = vtx1.name
-        vtx2.edges = []
+        # consolidate the child to the parent
+        srcVtx.childVertexName += (destVtx.childVertexName + [destVtx.name])
 
         # Clear self-loop
+        for childName in srcVtx.childVertexName:
 
-# pick '2' of vertex 3
+            if childName in srcVtx.edges:
+                #print('dropping ', childName)
+                #print(srcVtx.name, 'has child ', srcVtx.childVertexName, 'edge list', srcVtx.edges)
+                srcVtx.edges.remove(childName)
+
+
+
 class Vertex():
     def __init__ (self, name, edges):
         self.name = name
         self.edges = edges
         self.pointsToVertexName = None
-
+        self.childVertexName = []
 
 
 def radomlySelectEdge(G):
+    # manual testing
+    src = '1'
+    dest = '3'
 
-
-    dest = '2'
-    # only active vertex
-    if G.vtxStatus[dest] == False:
-        dest = G.vtxDict[dest].pointsToVertexName
-
-
-
-    return dest
+    return src, dest
 
 def printVtxEdgeList(G):
     for key in G.vtxDict.keys():
-        print(key, G.vtxDict[key].edges)
+        print(key, G.vtxDict[key].edges, 'child: ',  G.vtxDict[key].childVertexName)
 
 if __name__ == "__main__":
 
-    # read input
     G = Graph()
     #with open('kargerMincut.txt') as f:
     with open('graph.txt') as f:
@@ -67,16 +77,16 @@ if __name__ == "__main__":
 
         printVtxEdgeList(G)
 
-
-    while ( G.total_alive_vertices() > 2):
+    while ( G.total_alive_vertices() > 2 ):
         print("---merge")
         G.mergeVertex('1','2')
         printVtxEdgeList(G)
 
         print("---merge")
 
-        dest = radomlySelectEdge(G)
-        G.mergeVertex(dest,'3')
+        src, dest = radomlySelectEdge(G)
+
+        G.mergeVertex(src, dest)
         printVtxEdgeList(G)
 
         break
