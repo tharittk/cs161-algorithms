@@ -8,7 +8,6 @@ class Graph():
     def total_alive_vertices(self):
         return sum (self.vtxStatus.values())
 
-    
     def mergeVertex(self, srcName, destName):
 
         #print('in src: ', srcName, 'in dest: ', destName)
@@ -39,7 +38,7 @@ class Graph():
 
             # set inactive
             self.vtxStatus[destNameFinal] = False 
-            print(destNameFinal, 'becomes inactive')
+            #print(destNameFinal, 'becomes inactive')
             #print('in srcFinal: ', srcNameFinal, 'in destFinal: ', destNameFinal)
 
             # consolidate edge to the parent
@@ -64,12 +63,10 @@ class Graph():
             # clear self-loop
             for childName in srcVtxFinal.childVertexName:
 
-                if childName in srcVtxFinal.edges:
-                    #print('dropping ', childName)
-                    #print(srcVtx.name, 'has child ', srcVtx.childVertexName, 'edge list', srcVtx.edges)
+                while childName in srcVtxFinal.edges:
                     srcVtxFinal.edges.remove(childName)
 
-            if srcVtxFinal.name in srcVtxFinal.edges:
+            while srcVtxFinal.name in srcVtxFinal.edges:
                 srcVtxFinal.edges.remove(srcVtxFinal.name)
 
 
@@ -110,11 +107,11 @@ def printVtxEdgeList(G):
         print(key, G.vtxDict[key].edges, 'child: ',  G.vtxDict[key].childVertexName)
 
 if __name__ == "__main__":
-    random.seed(10)
+    random.seed(11)
 
     G = Graph()
-    with open('pa4.txt') as f:
-    #with open('kargerMincut.txt') as f:
+    #with open('pa4.txt') as f:
+    with open('kargerMincut.txt') as f:
     #with open('graph.txt') as f:
 
         lines = f.readlines()
@@ -127,24 +124,19 @@ if __name__ == "__main__":
             G.vtxDict[vertex.name] = vertex
             G.vtxStatus[vertex.name] = True
 
-        #printVtxEdgeList(G)
-
     while ( G.total_alive_vertices() > 2 ):
 
         src, dest = radomlySelectEdge(G)
-        print("---merge: src", src, 'dest', dest)
 
         G.mergeVertex(src, dest)
 
-        printVtxEdgeList(G)
 
 
     for key in G.vtxDict.keys():
         if G.vtxStatus[key] == True:
             print(key, 'edge len', len(G.vtxDict[key].edges))
-            
-    printVtxEdgeList(G)
 
-    #print("result: ")
+    #printVtxEdgeList(G)
+
 
 
