@@ -13,7 +13,7 @@ class Graph():
         self.currentLeader = None
         self.currentSource = None
         self.finishingTimeCounter = None
-        self.vtxList = []
+        #self.vtxList = []
 
     def _create_graph_old(self, inputFile, reverse= False):
         with open(inputFile) as f:
@@ -112,11 +112,6 @@ class Graph():
 
 
 
-
-
-
-
-
 if __name__ == "__main__":
     import sys, threading, numpy as np
     sys.setrecursionlimit(800000)
@@ -136,7 +131,7 @@ if __name__ == "__main__":
 
         #Grev.dfs_loop()
 
-        print('>>>', len(Grev.vtxList))
+        print('>>>', len(Grev.vtxDict.keys()))
 
         #for i in range(10):
         #    print(str(arr[i,0]), str(arr[i,1]))
