@@ -69,13 +69,13 @@ class Graph():
             else:
                 self.vtxDict[tail].edges.append(head)
 
-            if row % 100000 == 0:
-                print(row)
-
+    def _append_sink_vertex(self, nvtx):
         # append vtx that does not have outgoing edge
-        #for vtx in self.vtxList:
-        #    if vtx not in self.vtxDict.keys():
-        #        self.vtxDict[vtx] = Vertex(vtx, [])
+        keysList = self.vtxDict.keys()
+        for i in range(1, nvtx + 1):
+            vtx = str(i)
+            if vtx not in keysList:
+                self.vtxDict[vtx] = Vertex(vtx, [])
 
     def dfs(self, currentNode):
         # mark explored
@@ -90,11 +90,11 @@ class Graph():
         self.finishingTimeCounter += 1
         self.vtxDict[currentNode].finishingTime = self.finishingTimeCounter
 
-        print(">> Node ", currentNode, 'f(t): ', self.finishingTimeCounter)
+        #print(">> Node ", currentNode, 'f(t): ', self.finishingTimeCounter)
     
     def dfs_loop(self):
         keysList = list(self.vtxDict.keys())
-        n_vtx = len(self.vtxList)
+        n_vtx = len(keysList)
 
         self.finishingTimeCounter = 0
         self.currentSource = None
@@ -102,8 +102,8 @@ class Graph():
         for i in range(n_vtx, 0, -1):
             key = str(i)
             if not self.vtxDict[key].isExplored:
-                self.currentSource = str(key)
-                self.dfs(str(key))
+                self.currentSource = key
+                self.dfs(key)
 
         #for key in keysList:
         #    if not self.vtxDict[key].isExplored:
@@ -122,19 +122,18 @@ if __name__ == "__main__":
         G._create_graph("./scc_small.txt")
         Grev = Graph()
         Grev._create_graph("./scc.txt", reverse=True)
+        print('>>> Done Create: ', len(Grev.vtxDict.keys()))
 
+        nvtx = 875714
+        Grev._append_sink_vertex(nvtx)
+        print('>>> Done append Sink: ', len(Grev.vtxDict.keys()))
         #for key in G.vtxDict.keys():
         #    print(key, G.vtxDict[key].edges)
         
         #for key in Grev.vtxDict.keys():
         #    print(key, Grev.vtxDict[key].edges)
-
-        #Grev.dfs_loop()
-
-        print('>>>', len(Grev.vtxDict.keys()))
-
-        #for i in range(10):
-        #    print(str(arr[i,0]), str(arr[i,1]))
+        Grev.dfs_loop()
+        print('>>> Finishing DFS first pass')
 
     thread = threading.Thread(target=main)
     thread.start()
