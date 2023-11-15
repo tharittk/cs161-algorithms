@@ -12,8 +12,10 @@ class Graph():
         self.vtxDict = {}
         self.currentLeader = None
         self.currentSource = None
-        self.finishingTimeCounter = None
-        #self.vtxList = []
+        self.finishingTimeCounter = 0
+        self.finishingTimeRank = []
+        self.currentClusterSize = -1
+        self.clusterSizeList = []
 
     def _create_graph_old(self, inputFile, reverse= False):
         with open(inputFile) as f:
@@ -58,11 +60,6 @@ class Graph():
             tail = edges[row, ][tailIdx]
             head = edges[row, ][headIdx]
 
-            # TOO SLOW to implement
-            #if tail not in self.vtxList:
-            #        self.vtxList.append(tail)
-            #if head not in self.vtxList:
-            #        self.vtxList.append(head)
 
             if tail not in self.vtxDict.keys():
                 self.vtxDict[tail] = Vertex(tail, [head])
@@ -89,7 +86,12 @@ class Graph():
         
         self.finishingTimeCounter += 1
         self.vtxDict[currentNode].finishingTime = self.finishingTimeCounter
-
+        
+        # record the ranking from first to last
+        self.finishingTimeRank.append(currentNode)
+        
+        # for second pass
+        self.currentClusterSize += 1
         #print(">> Node ", currentNode, 'f(t): ', self.finishingTimeCounter)
     
     def dfs_loop(self):
@@ -105,11 +107,18 @@ class Graph():
                 self.currentSource = key
                 self.dfs(key)
 
-        #for key in keysList:
-        #    if not self.vtxDict[key].isExplored:
-        #        self.currentSource = key
-        #        self.dfs(key)
-
+    def dfs_second_pass(self):
+        self.currentClusterSize =  0
+        # reverse order, finish last comes first
+        for node in self.finishingTimeRank[::-1]:
+            
+            if not self.vtxDict[node].isExplored:
+                self.dfs(node)
+            # finish one dfs node
+            if self.currentClusterSize != 0:
+                self.clusterSizeList.append(self.currentClusterSize)
+            # reset the cluster size
+            self.currentClusterSize =  0
 
 
 if __name__ == "__main__":
@@ -119,21 +128,28 @@ if __name__ == "__main__":
     def main():
 
         G = Graph()
-        G._create_graph("./scc_small.txt")
+        G._create_graph("./scc.txt")
         Grev = Graph()
         Grev._create_graph("./scc.txt", reverse=True)
         print('>>> Done Create: ', len(Grev.vtxDict.keys()))
 
-        nvtx = 875714
+        #nvtx = 875714
+        nvtx = 9
         Grev._append_sink_vertex(nvtx)
         print('>>> Done append Sink: ', len(Grev.vtxDict.keys()))
-        #for key in G.vtxDict.keys():
-        #    print(key, G.vtxDict[key].edges)
-        
-        #for key in Grev.vtxDict.keys():
-        #    print(key, Grev.vtxDict[key].edges)
+
         Grev.dfs_loop()
         print('>>> Finishing DFS first pass')
+
+        #print(Grev.finishingTimeRank)
+
+        G.finishingTimeRank = Grev.finishingTimeRank
+
+        G.dfs_second_pass()
+        
+        print('>>> Finishing DFS second pass')
+        print('Cluster size list', G.clusterSizeList)
+
 
     thread = threading.Thread(target=main)
     thread.start()
