@@ -133,9 +133,10 @@ if __name__ == "__main__":
         Grev._create_graph("./scc.txt", reverse=True)
         print('>>> Done Create: ', len(Grev.vtxDict.keys()))
 
-        #nvtx = 875714
-        nvtx = 9
+        nvtx = 875714
+        #nvtx = 9
         Grev._append_sink_vertex(nvtx)
+        G._append_sink_vertex(nvtx)
         print('>>> Done append Sink: ', len(Grev.vtxDict.keys()))
 
         Grev.dfs_loop()
@@ -148,8 +149,8 @@ if __name__ == "__main__":
         G.dfs_second_pass()
         
         print('>>> Finishing DFS second pass')
-        print('Cluster size list', G.clusterSizeList)
-
+        ans = sorted(G.clusterSizeList, reverse=True)[:10]
+        print('Cluster size list Top 5', ans)
 
     thread = threading.Thread(target=main)
     thread.start()
