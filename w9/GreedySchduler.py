@@ -55,6 +55,6 @@ if __name__ == "__main__":
     scheduler = GreedyScheduler()
 
     scheduler.readInputFile('./jobs.txt')
-    scheduler.computeCost(option = 'ratio')
+    scheduler.computeCost(option = 'diff')
     scheduler.createSortedData()
     scheduler.computeCompletionTime()

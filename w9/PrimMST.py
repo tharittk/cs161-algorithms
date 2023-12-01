@@ -60,8 +60,6 @@ class Graph():
                 else:
                     mem.append((src, dest))
                 
-        #print(self.graph)
-        print(self.get_reachable_vertices(494))
     def initialize(self):
         
         # initialize vertex
@@ -74,15 +72,34 @@ class Graph():
 
         # O (mn) run-time
 
-        for w in self.VNotInTree:
-            #print('current w >> ', w)
-            currentDestInTree, currentMinCost = self.computeCheapestEdgeToCurrentTree(w)
-            if currentDestInTree != None:
+        allVertices = sorted(list(self.graph.keys()))
 
-                print(w, currentMinCost)
-        
-            else:
-                currentMinCost = float('inf')
+        sumEdgeWeight = 0
+
+        while sorted(self.VinTree) != allVertices:
+
+
+            globalMin = float('inf')
+            absorbedVertex = None
+
+            for w in self.VNotInTree:
+                #print('current w >> ', w)
+                currentDestInTree, currentMinCost = self.computeCheapestEdgeToCurrentTree(w)
+                if currentDestInTree != None:
+                    if currentMinCost < globalMin:
+                        globalMin = currentMinCost
+                        absorbedVertex = w
+            
+            # absorbed vertex
+            sumEdgeWeight += globalMin
+
+            self.VinTree.append(absorbedVertex)
+
+            self.VNotInTree.pop(self.VNotInTree.index(absorbedVertex))
+
+        print('finish, vtx in tree', len(self.VinTree))
+        print('total weight, ', sumEdgeWeight)
+
 
 
 
@@ -104,7 +121,6 @@ class Graph():
 
         return currentDestInTree, currentMinCost
     
-
     def maintainCheapestEdgeInvariant(self, absorbedVertex):
 
         reachableVertices = self.get_reachable_vertices(absorbedVertex)
@@ -121,7 +137,6 @@ class Graph():
 
                 pass
         return 0
-
 
     def get_reachable_vertices(self, src):
 
