@@ -44,6 +44,13 @@ class UnionFind():
             return parent
 
 
+def Graph():
+
+    def __init__(self):
+        self.num_nodes = None
+
+    def read_text_input(file_name):
+        
 
 
 if __name__ == "__main__":
