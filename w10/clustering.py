@@ -7,6 +7,7 @@ class UnionFind():
         self.num_nodes = n
         self.parents = np.arange(n) + 1
         self.ranks = np.ones(n)
+        self.leaders = [i for i in range(1, n+1)]
 
 
     def get_parent_of_node(self, i):
@@ -44,18 +45,37 @@ class UnionFind():
             return parent
 
 
-def Graph():
+class Graph():
 
     def __init__(self):
         self.num_nodes = None
 
-    def read_text_input(file_name):
-        
+        self.e1 = []
+        self.e2 = []
+        self.cost = []
 
+    def read_text_input(self, file_name):
+    
+        with open(file_name) as f:
+
+            self.num_nodes = int(f.readline().strip())
+
+            for line in f.readlines():
+                line = line.strip().split(" ")
+                self.e1.append(int(line[0]))
+                self.e2.append(int(line[1]))
+                self.cost.append(int(line[2]))
+
+def main():
+
+
+    # while cluster size != k i.e. len(self.leader) != k
+    #self.VNotInTree.pop(self.VNotInTree.index(absorbedVertex))
 
 if __name__ == "__main__":
     uf = UnionFind(4)
 
+    '''
     print(uf.parents)
     print(uf.get_parent_of_node(1))
 
@@ -67,3 +87,8 @@ if __name__ == "__main__":
 
     print(uf.find(2))
     print(uf.parents)
+    '''
+
+    g = Graph()
+    g.read_text_input('./cluster_small.txt')
+    print(len(g.e1))
