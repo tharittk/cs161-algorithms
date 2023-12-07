@@ -6,7 +6,7 @@ class UnionFind():
     def __init__(self, n):
         self.num_nodes = n
         self.parents = np.arange(n) + 1
-        self.ranks = np.ones(n)
+        self.ranks = np.zeros(n)
         self.leaders = [i for i in range(1, n+1)]
 
 
@@ -23,16 +23,20 @@ class UnionFind():
         self.parents[i - 1] = parent_node
     
     def union(self, i, j):
+        #rank_parent_i = self.get_rank_of_node( self.find(i) )
+        #rank_parent_j = self.get_rank_of_node( self.find(j) )
 
-        rank_i = self.get_rank_of_node(i)
-        rank_j = self.get_rank_of_node(j)
+        rank_parent_i = self.get_rank_of_node( self.get_parent_of_node(i) )
+        rank_parent_j = self.get_rank_of_node( self.get_parent_of_node(j) )
 
-        if rank_i >= rank_j:
-            self.change_parent_of_node[j, i]
-            self.increase_rank_of_node[i]
+        if rank_parent_i == rank_parent_j:
+            self.change_parent_of_node(self.get_parent_of_node(j), self.get_parent_of_node(i)) # arbitary
+            self.increase_rank_of_node(self.get_parent_of_node(i))
+
+        elif rank_parent_i > rank_parent_j:
+            self.change_parent_of_node(j, self.get_parent_of_node(i))
         else:
-            self.change_parent_of_node[i, j]
-            self.increase_rank_of_node[j]
+            self.change_parent_of_node(i, self.get_parent_of_node(j))
 
     def find(self, i):
         # itself is a root
@@ -67,28 +71,36 @@ class Graph():
                 self.cost.append(int(line[2]))
 
 def main():
-
+    return 0
 
     # while cluster size != k i.e. len(self.leader) != k
     #self.VNotInTree.pop(self.VNotInTree.index(absorbedVertex))
 
 if __name__ == "__main__":
-    uf = UnionFind(4)
+    uf = UnionFind(11)
 
-    '''
+    
+    print('parents before union:', uf.parents)
+
+    uf.union(1,2)
+    uf.union(2,3)
+    uf.union(3,4)
+    uf.union(5,6)
+    uf.union(6,7)
+    uf.union(8,9)
+    uf.union(10,11)
+
+    print('parents after union:', uf.parents)
+    print('ranks: ', uf.ranks)
+    uf.union(8,2)
+    uf.union(10,1)
+
+    print('parents after union tie:', uf.parents)
+    print('ranks: ', uf.ranks)
+    print(uf.find(11))
     print(uf.parents)
-    print(uf.get_parent_of_node(1))
+    
 
-    uf.change_parent_of_node(1,2)
-    uf.change_parent_of_node(2,3)
-    uf.change_parent_of_node(3,4)
-
-    print(uf.parents)
-
-    print(uf.find(2))
-    print(uf.parents)
-    '''
-
-    g = Graph()
-    g.read_text_input('./cluster_small.txt')
-    print(len(g.e1))
+    #g = Graph()
+    #g.read_text_input('./cluster_small.txt')
+    #print(len(g.e1))
