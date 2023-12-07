@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
     n_cluster = g.num_nodes
 
-    k = 3
+    k = 4
 
     for i in range(n_edges):
 
@@ -147,12 +147,17 @@ if __name__ == "__main__":
             
             uf.union(e1, e2)
 
+
+            if n_cluster <= k:
+                print(e1,e2, cost)
+
             # for sure not creating a cycle, reduce number of cluster by 1
+
             n_cluster = n_cluster - 1
-        
+
         # stop early
-        if n_cluster <= k:
-            break
+        #if n_cluster <= k:
+        #    break
 
     print('before exhaust find', np.unique(uf.parents))
     uf.exhaust_find()
