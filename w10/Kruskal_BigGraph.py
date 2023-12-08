@@ -101,7 +101,7 @@ if __name__ == "__main__":
     h = HammingEdges()
     h.read_hamming_input('./cluster_big.txt')
     g = Graph(h.n_nodes)
-    max_cost = 1
+    max_cost = 2
     for cost in range(0,max_cost + 1):
 
         for node in range(1, h.n_nodes + 1):
@@ -120,8 +120,27 @@ if __name__ == "__main__":
     print(g.e2[:10])
     print(g.cost[:10])
 
-    print(h.node_bits_int[165-1])
-    print(h.node_bits_int[103587-1])
+  
+    n_edges = len(g.cost)
+    uf = UnionFind(g.n_nodes)
+    n_cluster = g.n_nodes
 
-    #print(h.n_nodes)
-    #print(h.n_bits)
+    for i in range(n_edges):
+
+        e1 = g.e1[i]
+        e2 = g.e2[i]
+        cost = g.cost[i]
+
+        # if has no cycle
+        if uf.find(e1) != uf.find(e2):
+            
+            uf.union(e1, e2)
+
+            #if n_cluster <= k:
+            #    print(e1,e2, cost)
+
+            # for sure not creating a cycle, reduce number of cluster by 1
+
+            n_cluster = n_cluster - 1
+    print("start n_cluster:" , g.n_nodes)
+    print("Final n_cluster:" , n_cluster)
