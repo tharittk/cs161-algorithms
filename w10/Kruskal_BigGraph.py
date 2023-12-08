@@ -6,7 +6,6 @@ class HammingEdges():
         self.n_nodes = None
         self.n_bits = None
 
-        self.node_idx = []
         self.node_bits_int = []
 
         self.dist_node = {}
@@ -24,7 +23,6 @@ class HammingEdges():
             for line in f.readlines():
                 bin_str = ''.join(line.strip().split(" "))
                 bin_int = (int(bin_str, 2))
-                #self.node_idx.append(i)
                 self.node_bits_int.append(bin_int)
 
                 if bin_int in self.dist_node.keys():
@@ -41,7 +39,6 @@ class HammingEdges():
         node_idx = current_node - 1
         current_bit = self.node_bits_int[node_idx]
 
-        count= 0
         if cost == 0:
             exact_neighbors = self.dist_node[current_bit]
             for j in exact_neighbors:
@@ -62,8 +59,6 @@ class HammingEdges():
                     neighbors = self.dist_node[new_code]
                     for j in neighbors:
                         e2.append(j)
-
-                        count += 1
                 except:
                     pass
         
@@ -79,11 +74,10 @@ class HammingEdges():
                         neighbors = self.dist_node[new_code]
                         for j in neighbors:
                             e2.append(j)
-                            count += 1
                     except:
                         pass
 
-        return count
+        return e2
     
 class Graph():
 
@@ -94,21 +88,40 @@ class Graph():
         self.e2 = []
         self.cost = []
 
+    def appoint_e1_e2_cost(self, e1_node, e2_node_list, cost):
 
+        for i in range(len(e2_node_list)):
+            self.e1.append(e1_node)
+            self.e2.append(e2_node_list[i])
+            self.cost.append(cost)
 
 
 if __name__ == "__main__":
 
     h = HammingEdges()
     h.read_hamming_input('./cluster_big.txt')
-
-    count = 0
-    for node in range(1, h.n_nodes + 1):
-        count += h.search_for_neighbors_with_cost(node, 2)
-        #break
-    print(count)
-
     g = Graph(h.n_nodes)
+    max_cost = 1
+    for cost in range(0,max_cost + 1):
+
+        for node in range(1, h.n_nodes + 1):
+
+            e2_list= h.search_for_neighbors_with_cost(node, cost)
+
+            if e2_list != []:
+
+                g.appoint_e1_e2_cost(node, e2_list,cost)
+
+    print(len(g.e1))
+    print(len(g.e2))
+    print(len(g.cost))
+
+    print(g.e1[:10])
+    print(g.e2[:10])
+    print(g.cost[:10])
+
+    print(h.node_bits_int[165-1])
+    print(h.node_bits_int[103587-1])
 
     #print(h.n_nodes)
     #print(h.n_bits)
