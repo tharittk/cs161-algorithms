@@ -74,10 +74,42 @@ class Knapsack():
 
 
 
+    def big_size_run(self):
+        self.caches = {}
+
+        self.find_optimal_large(self.n, self.W)
+
+
+    def find_optimal_large(self,i, x):
+        # end of item          
+        if i == 0:
+            return 0
+        
+        key = '({i},{x})'.format(i=i, x=x)
+
+      # caching
+        if key in self.caches.keys():
+            return self.caches[key]
+
+        else:
+            wi = self.weights[i]
+            vi = self.values[i]
+
+            if x - wi < 0:
+                self.caches[key] = self.find_optimal_large(i -1, x)
+            else:
+                self.caches[key] = max( self.find_optimal_large(i -1, x), \
+                                self.find_optimal_large(i-1, x - wi) + vi )
+                
+            return self.caches[key]
 
 if __name__ == "__main__":
+    import sys
+
+    sys.setrecursionlimit(800000)
 
     W, n, values, weights = read_input('./ks_small.txt')
+    #W, n, values, weights = read_input('./ks_big.txt')
 
     # lecture case
     #W = 6
@@ -87,6 +119,13 @@ if __name__ == "__main__":
 
     ks = Knapsack(W, n, values, weights)
 
-    ks.naive_run(minimal=False)
+    #print(ks.n, ks.W, ks.values[-1], ks.weights[-1])
 
-    print("Maximum value: ", ks.A[ks.n][ks.W])
+    #ks.naive_run(minimal=False)
+    #print("Maximum value: ", ks.A[ks.n][ks.W])
+
+
+    ks.big_size_run()
+    key_opt = '({i},{x})'.format(i=ks.n, x = ks.W)
+
+    print("Maximum value: ", ks.caches[key_opt])
