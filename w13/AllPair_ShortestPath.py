@@ -4,10 +4,6 @@ class Graph():
         self.n = None
         self.m = None
         self.thc= {} # tail-head-cost
-
-        #self.head = []
-        #self.cost = []
-
     def read_text_input(self, file_name):
     
         with open(file_name) as f:
@@ -26,13 +22,6 @@ class Graph():
                     self.thc[tail][head] = cost
                 else:
                     self.thc[tail][head] = cost
-
-        print(self.thc)
-
-        #for i in range(1, self.n + 1):
-        #    if i not in self.head:
-        #        print(i)
-
 
 
 if __name__ == "__main__":
