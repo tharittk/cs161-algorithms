@@ -1,4 +1,4 @@
-from AllPair_ShortestPath import *
+from Johnson import *
 
 def dijkstra(G, node_start = 1):
     # initialization

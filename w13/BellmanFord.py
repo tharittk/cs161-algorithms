@@ -1,4 +1,4 @@
-from AllPair_ShortestPath import *
+from Johnson import *
 
 class Bellman_Ford():
 
