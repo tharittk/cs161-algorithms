@@ -137,7 +137,7 @@ if __name__ == "__main__":
     BF = Bellman_Ford(g)
     BF.initialize_2D(g.n)
     weights = BF.run()[:-1] # exclude the last psuedo-source vertex
-    #print(weights)
+    print('Min in weight: ', min(weights))
 
     print(">> Creating reweight graph")
     #g_rewighted = reweighting_and_create_graph('./johnson_g.txt', weights)
@@ -147,12 +147,12 @@ if __name__ == "__main__":
     #print('After reweight (tail <- head)', g_rewighted.thc)
 
     #print("Graph n: ", g.n, "m: ", g.m)
-    # all node as source
 
+'''
     min_from_all_source = []
+
     for s in range(1, g_rewighted.n + 1):
-        if s % 20 == 0:
-            print(">> Running Dijkstra: ", s)
+
 
         source_vertex = s
         raw_score = dijkstra(g_rewighted, source_vertex)
@@ -164,3 +164,4 @@ if __name__ == "__main__":
     #print('After Dijsktra (True score all):', min_from_all_source)
 
     print('After Dijsktra (True score min):', min(min_from_all_source))
+'''

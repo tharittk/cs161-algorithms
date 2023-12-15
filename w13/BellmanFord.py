@@ -21,28 +21,21 @@ class Bellman_Ford():
     def run(self):
         # edge budget from 1 upto m - 1
         for i in range(1, self.G.m + 1):
-            #print('running i---------:', i)
             if i % 1000 == 0:
                 print(i)
             for v in range(1, self.G.n + 1):
                 try:
                     min_cost = float('inf')
-                    #print('for v: ', v)
-                    #print(list(self.G.thc[v].keys()))
+
                     for w in self.G.thc[v].keys(): # incoming edge of v
                         current_cost = self.A[i-1][w] + self.G.thc[v][w]
 
                         if current_cost < min_cost:
                             min_cost = current_cost
 
-
-                        #incoming_cost.append(self.A[i-1][w] + self.G.thc[v][w])
                     self.A[i][v] = min( self.A[i - 1][v], min_cost)
-                    #print("store value A[i][v]", self.A[i][v])
                 except: # no incoming edge
-                    #print('no incoming edge')
                     self.A[i][v] = self.A[i-1][v]
-            #print('edge budget', i, 'self.A[i][:] = ', self.A[i][:] )
 
             # Stop early
             if self.A[i] == self.A[i - 1]:
@@ -56,7 +49,6 @@ class Bellman_Ford():
             return None
         else:
             print(">> Status: No Negtive-cost cycle")
-            #print('After-run A: ', self.out[-10:])
         
             return self.out
 

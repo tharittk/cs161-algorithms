@@ -35,13 +35,8 @@ def dijkstra(G, node_start = 1):
              break
 
         last_point_score[current_dest]= current_min_score
-        #try:
         vtx_explored.append(current_dest)
         vtx_unexplored.remove(current_dest)
-        #except:
-            #print(current_dest)
-            #print(last_point_score[current_dest])
-            #is_exhausted = True
 
 
     # for those unreachable
