@@ -9,6 +9,8 @@ class Graph():
         self.thc= {} # tail-head-cost
         self.htc = {} # head-tail-cost (for Dijkstra)
 
+
+
     def read_text_input(self, file_name):
     
         with open(file_name) as f:
@@ -80,8 +82,46 @@ class Graph():
             
         self.n = self.n + 1
 
-    def reweighting(self):
-        pass
+
+def reweighting_and_create_graph(file_name, weigths):
+    
+    g = Graph()
+    with open(file_name) as f:
+        line = f.readline().strip().split(" ")
+        g.n = int(line[0])
+        g.m = int(line[1])
+
+        for line in f.readlines():
+            line = line.strip().split(" ")
+            tail = int(line[0])
+            head = int(line[1])
+            cost = int(line[2])
+
+            # for Bellman-Ford
+            cost = cost + weights[head] - weights[tail]
+            if tail not in g.thc.keys():
+                g.thc[tail] = {}
+                g.thc[tail][head] = cost
+            else:
+                g.thc[tail][head] = cost
+
+                # for Dijkstra
+            if head not in g.htc.keys():
+                g.htc[head] = {}
+                g.htc[head][tail] = cost
+            else:
+                g.htc[head][tail] = cost   
+
+    return g
+    
+def get_true_score(weights, raw_score, source_vertex):
+    true_score = {}
+    for dest in raw_score.keys():
+        true_score[dest] = raw_score[dest] - weights[source_vertex] + weights[dest]
+    
+    return true_score
+
+
 
 if __name__ == "__main__":
     
@@ -91,17 +131,36 @@ if __name__ == "__main__":
     g.read_text_input('./johnson_g.txt')
     
     g.append_external_source_vertex(g.n + 1)
-
-    print('tail <- head', g.thc)
-    print('head -> tail', g.htc)
+    #print('tail <- head', g.thc)
+    #print('head -> tail', g.htc)
 
     BF = Bellman_Ford(g)
-
     BF.initialize_2D(g.n)
+    weights = BF.run()[:-1] # exclude the last psuedo-source vertex
+    #print(weights)
 
-    BF.run()
-    #print(BF.A)
+    g_rewighted = reweighting_and_create_graph('./johnson_g.txt', weights)
+    print(">> Creating reweight graph")
+    #g_rewighted = reweighting_and_create_graph('./g3.txt', weights)
 
-    print("Graph n: ", g.n, "m: ", g.m)
+    #print('After reweight (head -> tail)', g_rewighted.htc)
+    #print('After reweight (tail <- head)', g_rewighted.thc)
 
-    #print(BF.A)
+    #print("Graph n: ", g.n, "m: ", g.m)
+    # all node as source
+
+    min_from_all_source = []
+    for s in range(1, g_rewighted.n + 1):
+        if s % 20 == 0:
+            print(">> Running Dijkstra: ", s)
+
+        source_vertex = s
+        raw_score = dijkstra(g_rewighted, source_vertex)
+        true_score = get_true_score(weights, raw_score, source_vertex)
+
+        min_score = min(true_score.values())
+
+        min_from_all_source.append(min_score)
+    #print('After Dijsktra (True score all):', min_from_all_source)
+
+    print('After Dijsktra (True score min):', min(min_from_all_source))

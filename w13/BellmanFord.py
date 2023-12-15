@@ -42,20 +42,23 @@ class Bellman_Ford():
                 except: # no incoming edge
                     #print('no incoming edge')
                     self.A[i][v] = self.A[i-1][v]
-            print('edge budget', i, 'self.A[i][:] = ', self.A[i][:] )
+            #print('edge budget', i, 'self.A[i][:] = ', self.A[i][:] )
 
             # Stop early
             if self.A[i] == self.A[i - 1]:
-                print("Stop Early")
+                print(">> Stop Early")
 
                 self.out = self.A[i]
                 break        
 
         if self.A[-1] != self.A[-2]:
-            print("Negative-cost Cycle exist")
+            print(">> Status: Negative-cost Cycle exist")
+            return None
         else:
-            print("No Negtive-cost cycle")
+            print(">> Status: No Negtive-cost cycle")
             #print('After-run A: ', self.out[-10:])
+        
+            return self.out
 
 
 if __name__ == "__main__":
@@ -64,9 +67,9 @@ if __name__ == "__main__":
 
     g.read_text_input('./small_g.txt')
 
-    BF = Bellman_Ford(g, 1)
-    BF.initialize_2D()
+    BF = Bellman_Ford(g)
+    BF.initialize_2D(1)
     BF.run()
 
     print("Graph n: ", g.n, "m: ", g.m)
-    #print('After run A final: ', BF.A)
+    print('After run A final: ', BF.A)
