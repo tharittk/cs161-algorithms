@@ -140,8 +140,16 @@ if __name__ == "__main__":
     threading.stack_size(67108864)
     def main():
 
+        #big = 2,3,5
 
-        i = 4
+        #1 = 1
+        #2 = 0
+        #3 = 1
+        #4 = 1
+        #5 = 0
+        #6 = 0
+
+        i = 6
         edges = np.loadtxt('./2sat{i}.txt'.format(i=i), dtype=int, skiprows=1 )
         n_clauses = edges.shape[0]
         #n_vtx = 5 # test cases
@@ -164,19 +172,27 @@ if __name__ == "__main__":
         #print('>>> Done append Sink: ', len(Grev.vtxDict.keys()))
 
         Grev.dfs_loop()
-        print('>>> Finishing DFS on REV')
+        #print('>>> Finishing DFS on REV')
         G.finishingTimeRank = Grev.finishingTimeRank
         #print("time rank reverse", G.finishingTimeRank[::-1])
 
         G.dfs_second_pass()
         
-        print('>>> Finishing DFS second pass on Normal')
+        #print('>>> Finishing DFS second pass on Normal')
 
         ans = G.clusterSizeList
         members = G.clusters
         print('Cluster members', members)
         print('Cluster size list', ans)
         print('Number of SCC: ', len(ans))
+
+        # CHECK inside cluster
+
+        for cluster in members:
+            for member in cluster:
+                for member2 in cluster:
+                    if (member + member2) == 0:
+                        print('impossible', member, member2,'in',cluster) 
 
     thread = threading.Thread(target=main)
     thread.start()
