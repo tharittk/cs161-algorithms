@@ -17,51 +17,69 @@ class Graph():
         self.currentClusterSize = -1
         self.clusterSizeList = []
 
+        self.clusters = []
+        self.currentClusterMembers = []
+
         self.n_vars = None
 
     def create_graph(self, edges, reverse= False):
+
+        x1_idx = 0 # tail
+        x2_idx = 1 # head
+
         if not reverse:
-            x1_idx = 0 # tail
-            x2_idx = 1 # head
+            for row in range(edges.shape[0]):
 
-        # INCORRECT ON REVERSEs
+                x1 = edges[row, x1_idx]
+                x2 = edges[row, x2_idx]
+
+                # not x1 -> x2
+                if -x1 not in self.vtxDict.keys():
+                    self.vtxDict[-x1] = Vertex(-x1, [x2])
+                else:
+                    self.vtxDict[-x1].edges.append(x2)
+
+                # not x2 -> x1
+                if -x2 not in self.vtxDict.keys():
+                    self.vtxDict[-x2] = Vertex(-x2, [x1])
+                else:
+                    self.vtxDict[-x2].edges.append(x1)
+    
+        # reverse graph
         else:
-            x2_idx = 0
-            x1_idx = 1
+            for row in range(edges.shape[0]):
 
-        for row in range(edges.shape[0]):
+                x1 = edges[row, x1_idx]
+                x2 = edges[row, x2_idx]
 
-            x1 = edges[row, x1_idx]
-            x2 = edges[row, x2_idx]
+                # x2 -> not x1
+                if x2 not in self.vtxDict.keys():
+                    self.vtxDict[x2] = Vertex(x2, [-x1])
+                else:
+                    self.vtxDict[x2].edges.append(-x1)
 
-            # not x1 -> x2
-            if -x1 not in self.vtxDict.keys():
-                self.vtxDict[-x1] = Vertex(-x1, [x2])
-            else:
-                self.vtxDict[-x1].edges.append(x2)
-
-            # not x2 -> x1
-            if -x2 not in self.vtxDict.keys():
-                self.vtxDict[-x2] = Vertex(-x2, [x1])
-            else:
-                self.vtxDict[-x2].edges.append(x1)
-        
-
+                # x1 -> not x2
+                if x1 not in self.vtxDict.keys():
+                    self.vtxDict[x1] = Vertex(x1, [-x2])
+                else:
+                    self.vtxDict[x1].edges.append(-x2)
+    
     def append_sink_vertex(self):
         # append vtx that does not have outgoing edge
         keysList = self.vtxDict.keys()
-        for vtx in range(-self.n_vars, 0, -1):
+        for vtx in range(-self.n_vars, 0, 1):
             if vtx not in keysList:
                 self.vtxDict[vtx] = Vertex(vtx, [])
-                print(vtx, 'has no outgoing')
+                #print(vtx, 'has no outgoing')
 
         for vtx in range(1, self.n_vars + 1):
             if vtx not in keysList:
                 self.vtxDict[vtx] = Vertex(vtx, [])
-                print(vtx, 'has no outgoing')
+                #print(vtx, 'has no outgoing')
                 
+
     def dfs(self, currentNode):
-        print('explored, ', currentNode)
+        #print('explored, ', currentNode)
         # mark explored
         self.vtxDict[currentNode].isExplored = True
         # set leader node
@@ -79,17 +97,20 @@ class Graph():
         
         # for second pass
         self.currentClusterSize += 1
+        self.currentClusterMembers.append(currentNode)
         #print("cluster size: ", self.currentClusterSize)
         #print(">> Node ", currentNode, 'f(t): ', self.finishingTimeCounter)
     
     def dfs_loop(self):
-        keysList = list(self.vtxDict.keys())
 
         self.finishingTimeCounter = 0
         self.currentSource = None
 
+
         for key in range( self.n_vars, -self.n_vars - 1, -1):
             if key != 0:
+        
+        #for key in self.vtxDict.keys:
                 if not self.vtxDict[key].isExplored:
                     self.currentSource = key
                     self.dfs(key)
@@ -102,11 +123,14 @@ class Graph():
             if not self.vtxDict[node].isExplored:
                 self.dfs(node)
             # finish one dfs node
-            if self.currentClusterSize != 0:
+            #if self.currentClusterSize != 0 :
+            if self.currentClusterSize > 1:
+
                 self.clusterSizeList.append(self.currentClusterSize)
-                print("Appending Cluster")
+                self.clusters.append(self.currentClusterMembers)
             # reset the cluster size
             self.currentClusterSize =  0
+            self.currentClusterMembers = [] #reset
 
 
 
@@ -117,47 +141,43 @@ if __name__ == "__main__":
     def main():
 
 
-        i = 0
+        i = 4
         edges = np.loadtxt('./2sat{i}.txt'.format(i=i), dtype=int, skiprows=1 )
         n_clauses = edges.shape[0]
-        n_vtx = 5 # test cases
-        #n_vtx = n_clauses # PSET config
+        #n_vtx = 5 # test cases
+        n_vtx = n_clauses # PSET config
 
         G = Graph()
         G.create_graph(edges)
-        print('>>> Done Create: ', len(G.vtxDict.keys()))
+        #print('>>> Done Create: ', len(G.vtxDict.keys()))
+        
         Grev = Graph()
         Grev.create_graph(edges, reverse = True)
-        print('>>> Done Create reverse: ', len(Grev.vtxDict.keys()))
+        
+        #print('>>> Done Create reverse: ', len(Grev.vtxDict.keys()))
 
         G.n_vars = n_vtx
         Grev.n_vars = n_vtx
 
-
-        #Grev.append_sink_vertex()
-        #G.append_sink_vertex()
+        Grev.append_sink_vertex()
+        G.append_sink_vertex()
         #print('>>> Done append Sink: ', len(Grev.vtxDict.keys()))
 
         Grev.dfs_loop()
         print('>>> Finishing DFS on REV')
-        print("time rank reverse", Grev.finishingTimeRank[::-1])
-
-        G.dfs_loop()
-        print('>>> Finishing DFS on NORMAL')
-        print("time rank reverse", G.finishingTimeRank[::-1])
-
-        #G.finishingTimeRank = Grev.finishingTimeRank
+        G.finishingTimeRank = Grev.finishingTimeRank
         #print("time rank reverse", G.finishingTimeRank[::-1])
 
-        #G.dfs_second_pass()
+        G.dfs_second_pass()
         
-        #print('>>> Finishing DFS second pass')
-    '''
+        print('>>> Finishing DFS second pass on Normal')
 
-        ans = sorted(G.clusterSizeList, reverse=True)
+        ans = G.clusterSizeList
+        members = G.clusters
+        print('Cluster members', members)
         print('Cluster size list', ans)
         print('Number of SCC: ', len(ans))
-    '''
+
     thread = threading.Thread(target=main)
     thread.start()
 
