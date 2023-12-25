@@ -1,4 +1,6 @@
-Algorithms Implementation for programming assignment CS 161
+# Algorithms Implementation for programming assignments CS 161
+
+Course page: https://www.coursera.org/specializations/algorithms
 
 Week 1 - Divide and Conquer (NAME multiplacation)
 
