@@ -2,7 +2,7 @@
 
 Course page: https://www.coursera.org/specializations/algorithms
 
-Week 1 - Divide and Conquer (NAME multiplacation)
+Week 1 - Divide and Conquer (fast multiplacation)
 
 Week 2 - Divide and Conquer (counting array inversion)
 
